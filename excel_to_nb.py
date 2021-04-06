@@ -302,13 +302,13 @@ def assign_ipv4():
                 try:
                     nb.ipam.ip_addresses.create(temp_loop0)
                 except pynautobot.RequestError as e:
-                    error_log.write("{0} {1}\n{2}\n".format(data['hostname'],x['ipv4_loopback0'], str(e.error)))
-                    print(data['hostname'],x['ipv4_loopback0'])
+                    error_log.write("{0} {1}\n{2}\n".format(data['hostname'],data['ipv4_loopback0'], str(e.error)))
+                    print(data['hostname'],data['ipv4_loopback0'])
                     print(e.error)
                     pass
             if dup_ip != None:
-                error_log.write("{0} {1} already assigned\n".format(data['hostname'],x['ipv4_loopback0']))
-                print(x['ipv4_loopback0']+ " already assigned")
+                error_log.write("{0} {1} already assigned\n".format(data['hostname'],data['ipv4_loopback0']))
+                print(data['ipv4_loopback0']+ " already assigned")
 
         if nb.dcim.interfaces.get(name='Loopback1',device=data['hostname']) != None:
             loopback1=nb.dcim.interfaces.get(name='Loopback1',device=data['hostname'])
@@ -326,39 +326,62 @@ def assign_ipv4():
                 try:
                     nb.ipam.ip_addresses.create(temp_loop1)
                 except pynautobot.RequestError as e:
-                    error_log.write("{0} {1}\n{2}\n".format(data['hostname'],x['ipv4_loopback1'], str(e.error)))
-                    print(data['hostname'],x['ipv4_loopback1'])
+                    error_log.write("{0} {1}\n{2}\n".format(data['hostname'],data['ipv4_loopback1'], str(e.error)))
+                    print(data['hostname'],data['ipv4_loopback1'])
                     print(e.error)
                     pass
 
             if dup_ip != None:
-                error_log.write("{0} {1} already assigned\n".format(data['hostname'],x['ipv4_loopback1']))
-                print(x['ipv4_loopback1']+ " already assigned")
+                error_log.write("{0} {1} already assigned\n".format(data['hostname'],data['ipv4_loopback1']))
+                print(data['ipv4_loopback1']+ " already assigned")
 
-        if nb.dcim.interfaces.get(name='Loopback100',device=data['hostname']) != None:
+        if data["ipv4_loopback100"] != None:
             loopback100=nb.dcim.interfaces.get(name='Loopback100',device=data['hostname'])
-            dup_ip = nb.ipam.ip_addresses.get(assigned_object_id=loopback100.id,address=data['ipv4_loopback100'])
-            if loopback100 != None and dup_ip == None:
-                temp_loop100={
-                    'address': data['ipv4_loopback100'],
-                    "status": "active",
-                    "role": "anycast",
-                    "tenant": {'name': 'PLDT', 'slug': 'pldt'},
-                    "assigned_object_type": "dcim.interface",
-                    'assigned_object_id': loopback100.id,
-                    'assigned_object': {'id': loopback100.id, 'device': {'name': data['hostname']}}
-                }
-                try:
-                    nb.ipam.ip_addresses.create(temp_loop100)
-                except pynautobot.RequestError as e:
-                    error_log.write("{0} {1}\n{2}\n".format(data['hostname'],x['ipv4_loopback100'], str(e.error)))
-                    print(data['hostname'],x['ipv4_loopback100'])
-                    print(e.error)
-                    pass
-            if dup_ip != None:
-                error_log.write("{0} {1} already assigned\n".format(data['hostname'],x['ipv4_loopback100']))
-                print(x['ipv4_loopback100']+ " already assigned")
-
+            try:
+                dup_ip = nb.ipam.ip_addresses.get(assigned_object_id=loopback100.id,address=data['ipv4_loopback100'])
+                if dup_ip == None:
+                    temp_loop100={
+                        'address': data['ipv4_loopback100'],
+                        "status": "active",
+                        "role": "anycast",
+                        "tenant": {'name': 'PLDT', 'slug': 'pldt'},
+                        "assigned_object_type": "dcim.interface",
+                        'assigned_object_id': loopback100.id,
+                        'assigned_object': {'id': loopback100.id, 'device': {'name': data['hostname']}}
+                    }
+                    try:
+                        nb.ipam.ip_addresses.create(temp_loop100)
+                    except pynautobot.RequestError as e:
+                        error_log.write("{0} {1}\n{2}\n".format(data['hostname'],data['ipv4_loopback100'], str(e.error)))
+                        print(data['hostname'],data['ipv4_loopback100'])
+                        print(e.error)
+                        pass
+                if dup_ip != None:
+                    if dup_ip.assigned_object.device==data['hostname']:
+                        error_log.write("{0} {1} already assigned\n".format(data['hostname'],data['ipv4_loopback100']))
+                        print(data['ipv4_loopback100']+ " already assigned")
+                        continue
+                    elif dup_ip.assigned_object.device != data['hostname']:
+                        temp_loop100={
+                            'address': data['ipv4_loopback100'],
+                            "status": "active",
+                            "role": "anycast",
+                            "tenant": {'name': 'PLDT', 'slug': 'pldt'},
+                            "assigned_object_type": "dcim.interface",
+                            'assigned_object_id': loopback100.id,
+                            'assigned_object': {'id': loopback100.id, 'device': {'name': data['hostname']}}
+                        }
+                        try:
+                            nb.ipam.ip_addresses.create(temp_loop100)
+                        except pynautobot.RequestError as e:
+                            error_log.write("{0} {1}\n{2}\n".format(data['hostname'],data['ipv4_loopback100'], str(e.error)))
+                            print(data['hostname'],data['ipv4_loopback100'])
+                            print(e.error)
+                            pass
+            except:
+                dup_ip = nb.ipam.ip_addresses.filter(assigned_object_id=loopback100.id,address=data['ipv4_loopback100'])
+                print(dup_ip)
+                pass
 
 def assign_ipv6():
     for i in p.nodes:
@@ -403,13 +426,13 @@ def assign_ipv6():
                 try:
                     nb.ipam.ip_addresses.create(temp_loop0)
                 except pynautobot.RequestError as e:
-                    error_log.write("{0} {1}\n{2}\n".format(data['hostname'],x['ipv6_loopback0'], str(e.error)))
-                    print(data['hostname'],x['ipv6_loopback0'])
+                    error_log.write("{0} {1}\n{2}\n".format(data['hostname'],data['ipv6_loopback0'], str(e.error)))
+                    print(data['hostname'],data['ipv6_loopback0'])
                     print(e.error)
                     pass
             if dup_ip != None:
-                error_log.write("{0} {1} already assigned\n".format(data['hostname'],x['ipv6_loopback0']))
-                print(x['ipv6_loopback0']+ " already assigned")
+                error_log.write("{0} {1} already assigned\n".format(data['hostname'],data['ipv6_loopback0']))
+                print(data['ipv6_loopback0']+ " already assigned")
 
 
         if nb.dcim.interfaces.get(name='Loopback1',device=data['hostname']) != None:
@@ -428,13 +451,13 @@ def assign_ipv6():
                 try:
                     nb.ipam.ip_addresses.create(temp_loop1)
                 except pynautobot.RequestError as e:
-                    error_log.write("{0} {1}\n{2}\n".format(data['hostname'],x['ipv6_loopback1'], str(e.error)))
-                    print(data['hostname'],x['ipv6_loopback1'])
+                    error_log.write("{0} {1}\n{2}\n".format(data['hostname'],data['ipv6_loopback1'], str(e.error)))
+                    print(data['hostname'],data['ipv6_loopback1'])
                     print(e.error)
                     pass
             if dup_ip != None:
-                error_log.write("{0} {1} already assigned\n".format(data['hostname'],x['ipv6_loopback1']))
-                print(x['ipv6_loopback1']+ " already assigned")
+                error_log.write("{0} {1} already assigned\n".format(data['hostname'],data['ipv6_loopback1']))
+                print(data['ipv6_loopback1']+ " already assigned")
 
 def assign_primary():
     devices=nb.dcim.devices.all()
@@ -508,7 +531,6 @@ if __name__ == "__main__":
     add_site(site_list)
     add_device(device_list)
 
-
     add_loopback()
     add_bundle_interface()
     add_phy_interface()
@@ -517,3 +539,9 @@ if __name__ == "__main__":
     assign_ipv6()
     assign_primary()
     assign_custom_interfaces()
+
+
+    #loopback0= nb.ipam.ip_addresses.filter(interface='Loopback0',family=4)
+    #loopback1= nb.ipam.ip_addresses.filter(interface='Loopback1',family=4)
+    #p2p = nb.ipam.ip_addresses.filter(mask_length=30)
+    #anycast = nb.ipam.ip_addresses.filter(role='anycast')

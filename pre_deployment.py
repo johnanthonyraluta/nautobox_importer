@@ -19,7 +19,17 @@ nb.http_session.verify = False
 
 try:
     nb.tenancy.tenants.create({"name": "PLDT", 'slug': "pldt"})
+except pynautobot.RequestError as e:
+    print(e.error)
+    pass
+
+try:
     nb.dcim.manufacturers.create({"name": "Cisco", 'slug': "cisco"})
+except pynautobot.RequestError as e:
+    print(e.error)
+    pass
+
+try:
     nb.dcim.platforms.create({"name": "IOS-XR", 'slug': "ios-xr","manufacturer": nb.dcim.manufacturers.get(name="Cisco").id})
 except pynautobot.RequestError as e:
     print(e.error)

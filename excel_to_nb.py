@@ -505,16 +505,16 @@ if __name__ == "__main__":
 
     site_list=api_node(nodes)[0]
     device_list=api_node(nodes)[1]
-    #add_site(site_list)
-    #add_device(device_list)
+    add_site(site_list)
+    add_device(device_list)
 
 
     p=xlsx_graph(args.file, args.node, args.links)
-    #add_loopback()
-    #add_bundle_interface()
-    #add_phy_interface()
+    add_loopback()
+    add_bundle_interface()
+    add_phy_interface()
     add_connection()
-    #assign_ipv4()
-    #assign_ipv6()
-    #assign_primary()
-    #assign_custom_interfaces()
+    assign_ipv4()
+    assign_ipv6()
+    assign_primary()
+    assign_custom_interfaces()

@@ -16,6 +16,16 @@ nb = pynautobot.api(
 
 nb.http_session.verify = False
 
+try:
+    nb.dcim.regions.create({"name": "GMM", 'slug': "gmm", 'description': "Greater Metro Manila"})
+    nb.dcim.regions.create({"name": "NL", 'slug': "nl", 'description': "North Luzon"})
+    nb.dcim.regions.create({"name": "SL", 'slug': "sl", 'description': "South Luzon"})
+
+except pynautobot.RequestError as e:
+    print(e.error)
+    pass
+
+
 
 try:
     nb.tenancy.tenants.create({"name": "PLDT", 'slug': "pldt"})

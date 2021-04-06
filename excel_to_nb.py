@@ -502,12 +502,10 @@ if __name__ == "__main__":
     args = parser.parse_args()
     nodes=load_data(args.file,args.node)
 
-
     site_list=api_node(nodes)[0]
     device_list=api_node(nodes)[1]
     add_site(site_list)
     add_device(device_list)
-
 
     p=xlsx_graph(args.file, args.node, args.links)
     add_loopback()
